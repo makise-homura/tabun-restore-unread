@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Восстановление непрочитанных комментов на Табуне
-// @version      0.1
+// @version      0.2
 // @description  Добавляет возможность "вспомнить" непрочитанные комменты после случайного обновления или закрытия страницы
 // @author       makise_homura
 // @match        https://tabun.everypony.ru/*
@@ -34,14 +34,14 @@ const enableDebug = false;
     function saveUnread()
     {
         // Don't save if there's no change
-        var currentUnread = getUnread();
-        if (JSON.parse(localStorage[threadKey + "_now"]) == currentUnread) return;
+        var currentUnread = JSON.stringify(getUnread());
+        if (localStorage[threadKey + "_now"] == currentUnread) return;
 
-        if (enableDebug) console.log("tabun-restore-unread::saveUnread()");
+        if (enableDebug) console.log("tabun-restore-unread::saveUnread(prev: " + JSON.parse(localStorage[threadKey + "_now"]) + ", now: " + currentUnread + ")");
 
         // Save current unread list
         localStorage[threadKey + "_prev"] = localStorage[threadKey + "_now"];
-        localStorage[threadKey + "_now"] = JSON.stringify(currentUnread);
+        localStorage[threadKey + "_now"] = currentUnread;
 
         // Save data for comments counter
         var counter = document.getElementById("new_comments_counter");
@@ -52,18 +52,23 @@ const enableDebug = false;
 
     function restoreUnread()
     {
-        if (enableDebug) console.log("tabun-restore-unread::restoreUnread()");
-
         // If current == "now", restore "prev", else restore "now".
         var commentsToRestore = localStorage[threadKey + "_now"];
         var commentLast = localStorage[threadKey + "_last_now"];
+        if (commentsToRestore == JSON.stringify(getUnread()))
+        {
+            commentsToRestore = localStorage[threadKey + "_prev"];
+            commentLast = localStorage[threadKey + "_last_prev"];
+        }
+
+        if (enableDebug) console.log("tabun-restore-unread::restoreUnread(toRestore: " + commentsToRestore + ")");
 
         // Restore class for every comment
         var restoredUnread = JSON.parse(commentsToRestore);
-        restoreUnread.forEach((comment) =>
+        restoredUnread.forEach((comment) =>
         {
             var commentNode = document.getElementById("comment_id_" + comment);
-            if (commentNode == null) commentNode.classList.add("comment-new");
+            if (commentNode != null) commentNode.classList.add("comment-new");
         });
 
         // Update new comments counter
@@ -89,7 +94,7 @@ const enableDebug = false;
     // Save initial state and add an observer to save when it changes
     saveUnread();
     var commentsNode = document.querySelector('#content-wrapper');
-    if (commentsNode) new MutationObserver(saveUnread).observe(commentsNode, {childList: true, subtree: true});
+    if (commentsNode) new MutationObserver(saveUnread).observe(commentsNode, {childList: true, subtree: true, attributes: true});
 
     // Add a button to restore unread comments
     var rightPad = document.getElementById("update-comments");
@@ -100,6 +105,6 @@ const enableDebug = false;
     button.style.background = "url(https://static.everypony.ru/icons-synio.74234a99d817ffbad12103b32393ee10.png) -131px -71px no-repeat";
     button.style.margin = "1px 1px -5px -5px";
     button.style.transform = "scale(-1, 1)";
-    button.addEventListener("click", restoreUnread);
     rightPad.before(button);
+    button.onclick = restoreUnread;
 })();
