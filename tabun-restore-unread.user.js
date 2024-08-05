@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Восстановление непрочитанных комментов на Табуне
-// @version      0.3
+// @version      0.4
 // @description  Добавляет возможность "вспомнить" непрочитанные комменты после случайного обновления или закрытия страницы
 // @author       makise_homura, Brolks
 // @match        https://tabun.everypony.ru/*
@@ -52,8 +52,18 @@ const enableDebug = false;
     };
 
     var restoreUnread = function() {
+        var commentsNow = getUnread();
         var commentsToRestore = JSON.parse(localStorage[threadKey + '_now']) || JSON.parse(localStorage[threadKey + '_prev']);
         var commentLast = localStorage[threadKey + '_last_now'] || localStorage[threadKey + '_last_prev'];
+
+        var arraySame = function(arr1, arr2) {
+            return arr1.length === arr2.length && arr1.every((v) => arr2.includes(v));
+        }
+
+        if (arraySame(commentsNow, commentsToRestore)) {
+            commentsToRestore = JSON.parse(localStorage[threadKey + '_prev']);
+            commentLast = localStorage[threadKey + '_last_prev'];
+        }
 
         log('tabun-restore-unread::restoreUnread(toRestore: ' + commentsToRestore + ')');
 
