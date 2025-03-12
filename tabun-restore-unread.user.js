@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Восстановление непрочитанных комментов на Табуне
-// @version      0.4
+// @version      0.5
 // @description  Добавляет возможность "вспомнить" непрочитанные комменты после случайного обновления или закрытия страницы
 // @author       makise_homura, Brolks
 // @match        https://tabun.everypony.ru/*
@@ -92,7 +92,7 @@ const enableDebug = false;
     var button = document.createElement("i");
     button.id = "restore-comments";
     button.classList.add("update-comments");
-    button.style.cssText = "background: url(https://static.everypony.ru/icons-synio.74234a99d817ffbad12103b32393ee10.png) -131px -71px no-repeat; margin: 1px 1px -5px -5px; transform: scale(-1, 1);";
+    button.style.cssText = "background: url(https://cdn.everypony.ru/storage/06/08/97/2025/03/12/c49fd03d1b.png) -131px -71px no-repeat; margin: 1px 1px -5px -5px; transform: scale(-1, 1);";
     rightPad.before(button);
     button.onclick = restoreUnread;
 })();
