@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Восстановление непрочитанных комментов на Табуне
-// @version      0.6
+// @version      0.7
 // @description  Добавляет возможность "вспомнить" непрочитанные комменты после случайного обновления или закрытия страницы
 // @author       makise_homura, Brolks
 // @match        https://tabun.everypony.ru/*
@@ -13,7 +13,7 @@
 const enableDebug = false;
 
 (function() {
-    var pageIdSel = document.querySelector(".favourite");
+    var pageIdSel = document.querySelector(".favorite");
     if (!pageIdSel) return;
 
     var threadId = pageIdSel.dataset.target_id;
